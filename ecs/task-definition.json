@@ -1,13 +1,13 @@
 {
-    "family": "test-task",
+    "family": "task-backend",
     "containerDefinitions": [
         {
-            "name": "test-container",
-            "image": "590184115182.dkr.ecr.ap-south-1.amazonaws.com/test-repo:latest",
+            "name": "backend-container",
+            "image": "590183911139.dkr.ecr.us-east-1.amazonaws.com/demo-repo:latest",
             "cpu": 0,
             "portMappings": [
                 {
-                    "name": "https",
+                    "name": "backend-container-80-tcp",
                     "containerPort": 80,
                     "hostPort": 80,
                     "protocol": "tcp",
@@ -24,8 +24,8 @@
                 "logDriver": "awslogs",
                 "options": {
                     "awslogs-create-group": "true",
-                    "awslogs-group": "/ecs/test-task",
-                    "awslogs-region": "ap-south-1",
+                    "awslogs-group": "/ecs/task-backend",
+                    "awslogs-region": "us-east-1",
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -33,7 +33,7 @@
             "systemControls": []
         }
     ],
-    "executionRoleArn": "arn:aws:iam::590184115182:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::590183911139:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
     "requiresCompatibilities": [
         "FARGATE"
