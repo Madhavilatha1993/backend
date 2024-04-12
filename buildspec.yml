@@ -3,7 +3,7 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 590184115182.dkr.ecr.ap-south-1.amazonaws.com/test-repo
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 590183911139.dkr.ecr.us-east-1.amazonaws.com/demo-repo
       - envsubst < ecs/task-definition.json > ecs/task-definition1.json
       - mkdir ~/abc
       - cd ~/abc
@@ -14,7 +14,7 @@ phases:
       # - mkdir partner
       - |
           cat > ~/Dockerfile << EOF
-          FROM 590184115182.dkr.ecr.ap-south-1.amazonaws.com/test-repo:latest
+          FROM 590183911139.dkr.ecr.us-east-1.amazonaws.com/demo-repo:latest
           WORKDIR .
           COPY ./abc/ .
           EXPOSE 8080
@@ -27,12 +27,12 @@ phases:
         # - npm install
         # - npm run build
         - ls
-        - docker build -t test-repo .
+        - docker build -t demo-repo .
   post_build:
     commands:
-        - docker tag test-repo:latest 590184115182.dkr.ecr.ap-south-1.amazonaws.com/test-repo:latest
+        - docker tag test-repo:latest590183911139.dkr.ecr.us-east-1.amazonaws.com/demo-repo:latest
         - echo repose-ecs
-        - docker push 590184115182.dkr.ecr.ap-south-1.amazonaws.com/test-repo:latest
-        - aws ecs register-task-definition --family test-task --region ap-south-1 --cli-input-json file:///$CODEBUILD_SRC_DIR/ecs/task-definition1.json
-        - TASK_REVISION=$(aws ecs describe-task-definition --task-definition test-task --region ap-south-1)
-        - aws ecs update-service --cluster test --service test-service --region ap-south-1 --task-definition test-task
+        - docker push 590183911139.dkr.ecr.us-east-1.amazonaws.com/demo-repo:latest
+        - aws ecs register-task-definition --family task-backend --region us-east-1 --cli-input-json file:///$CODEBUILD_SRC_DIR/ecs/task-definition1.json
+        - TASK_REVISION=$(aws ecs describe-task-definition --task-definition test-task --region us-east-1)
+        - aws ecs update-service --cluster test --service test-service --region us-east-1 --task-definition task-backend
