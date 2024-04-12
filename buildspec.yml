@@ -30,9 +30,9 @@ phases:
         - docker build -t demo-repo .
   post_build:
     commands:
-        - docker tag test-repo:latest590183911139.dkr.ecr.us-east-1.amazonaws.com/demo-repo:latest
+        - docker tag demo-repo:latest 590183911139.dkr.ecr.us-east-1.amazonaws.com/demo-repo:latest
         - echo repose-ecs
         - docker push 590183911139.dkr.ecr.us-east-1.amazonaws.com/demo-repo:latest
         - aws ecs register-task-definition --family task-backend --region us-east-1 --cli-input-json file:///$CODEBUILD_SRC_DIR/ecs/task-definition1.json
-        - TASK_REVISION=$(aws ecs describe-task-definition --task-definition test-task --region us-east-1)
-        - aws ecs update-service --cluster test --service test-service --region us-east-1 --task-definition task-backend
+        - TASK_REVISION=$(aws ecs describe-task-definition --task-definition task-backend --region us-east-1)
+        - aws ecs update-service --cluster cluster-backend --service service-backend --region us-east-1 --task-definition task-backend
