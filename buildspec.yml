@@ -1,0 +1,38 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 590184115182.dkr.ecr.ap-south-1.amazonaws.com/test-repo
+      - envsubst < ecs/task-definition.json > ecs/task-definition1.json
+      - mkdir ~/abc
+      - cd ~/abc
+      # - mkdir pgw
+      # - mkdir merchant
+      # - mkdir backoffice
+      # - mkdir agent
+      # - mkdir partner
+      - |
+          cat > ~/Dockerfile << EOF
+          FROM 590184115182.dkr.ecr.ap-south-1.amazonaws.com/test-repo:latest
+          WORKDIR .
+          COPY ./abc/ .
+          EXPOSE 8080
+          # CMD [ "npm", "run", "start" ]
+          EOF
+      - cat ~/Dockerfile
+  build:
+    commands:
+        - cd $CODEBUILD_SRC_DIR
+        # - npm install
+        # - npm run build
+        - ls
+        - docker build -t test-repo .
+  post_build:
+    commands:
+        - docker tag test-repo:latest 590184115182.dkr.ecr.ap-south-1.amazonaws.com/test-repo:latest
+        - echo repose-ecs
+        - docker push 590184115182.dkr.ecr.ap-south-1.amazonaws.com/test-repo:latest
+        - aws ecs register-task-definition --family test-task --region ap-south-1 --cli-input-json file:///$CODEBUILD_SRC_DIR/ecs/task-definition1.json
+        - TASK_REVISION=$(aws ecs describe-task-definition --task-definition test-task --region ap-south-1)
+        - aws ecs update-service --cluster test --service test-service --region ap-south-1 --task-definition test-task
